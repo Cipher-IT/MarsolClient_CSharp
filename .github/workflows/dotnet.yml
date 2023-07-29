@@ -12,7 +12,9 @@ env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
   DOTNET_NOLOGO: true
   NuGetDirectory: ${{ github.workspace}}/nuget
-  
+defaults:
+  run:
+    shell: pwsh
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -40,11 +42,11 @@ jobs:
           with:
             name: nuget
             path: ${{ env.NuGetDirectory }}
-          
+
         # Install the .NET SDK indicated in the global.json file
         - name: Setup .NET Core
           uses: actions/setup-dotnet@v3
-          
+
         # Publish all NuGet packages to NuGet.org
         # Use --skip-duplicate to prevent errors if a package with the same version already exists.
         # If you retry a failed workflow, already published packages will be skipped without error.
