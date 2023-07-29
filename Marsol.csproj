@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+	  <VersionPrefix>0.0.1</VersionPrefix>
 	  <ImplicitUsings>enable</ImplicitUsings>
 	  <LangVersion>10.0</LangVersion>
 	  <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
