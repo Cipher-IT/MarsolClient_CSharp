@@ -10,7 +10,7 @@ namespace Marsol.Models
     /// </summary>
     public class MarsolRecipient
     {
-        private static readonly string MOBILE_PHONE_REGEX_STRING = @"^09[1|2|4|5][0-9]{6}$";
+        private static readonly string MOBILE_PHONE_REGEX_STRING = @"^09[1|2|4|5][0-9]{7}$";
         private static readonly Regex MOBILE_PHONE_REGEX = new Regex(MOBILE_PHONE_REGEX_STRING);
         /// <summary>
         /// 
