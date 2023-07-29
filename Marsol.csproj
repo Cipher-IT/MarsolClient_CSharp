@@ -14,14 +14,25 @@
 		<Company>Cipher IT</Company>
 		<Description>Libyan SMS service</Description>
 		<Copyright>Cipher IT</Copyright>
-		<PackageTags>sms:libya:libyana:almadar</PackageTags>
+		<PackageTags>sms;libya;libyana;almadar</PackageTags>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://marsol.ly</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/Cipher-IT/MarsolClient_CSharp</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Flurl" Version="3.0.7" />
     <PackageReference Include="Flurl.Http" Version="3.2.4" />
     <PackageReference Include="sms.helpers" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
