@@ -14,6 +14,10 @@ namespace Marsol.Models
         {
             Text = message;
         }
+        public MarsolMessage()
+        {
+            
+        }
         /// <summary>
         /// 
         /// </summary>

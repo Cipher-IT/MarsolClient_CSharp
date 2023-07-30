@@ -9,9 +9,10 @@ namespace Marsol.Exceptions
     /// </summary>
     public class MarsolInvalidMessageExceptions : MarsolException
     {
+        public readonly MarsolMessage Message;
         public MarsolInvalidMessageExceptions(MarsolMessage message) : base("رسالة غير صحيحة")
         {
-
+            this.Message = message;
         }
     }
 }

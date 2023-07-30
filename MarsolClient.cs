@@ -42,7 +42,23 @@ namespace Marsol
         /// <exception cref="MarsolApiNotFoundException"></exception>
         /// <exception cref="MarsolApiUnAuthorizedException"></exception>
         /// <exception cref="MarsolApiBadRequestException"></exception>
-        public async Task<SendSmsResponse> SendSMSAsync(SendSmsRequest request)
+        [Obsolete("Use MarsolSmsRequest instead", false)]
+        public Task<SendSmsResponse> SendSMSAsync(SendSmsRequest request)
+        {
+            return this.SendSMSAsync(request);
+        }
+
+        /// <summary>
+        /// إرسال رسالة نصية قصيرة لمجموعة مستلمين
+        /// </summary>
+        /// <param name="request">طلب يحتوي على نص الرسالة و قائمة من أرقام المستلمين</param>
+        /// <returns></returns>
+        /// <exception cref="MarsolException"></exception>
+        /// <exception cref="MarsolApiServerException"></exception>
+        /// <exception cref="MarsolApiNotFoundException"></exception>
+        /// <exception cref="MarsolApiUnAuthorizedException"></exception>
+        /// <exception cref="MarsolApiBadRequestException"></exception>
+        public async Task<SendSmsResponse> SendSMSAsync(MarsolSmsRequest request)
         {
             request.Validate();
             try
@@ -59,6 +75,7 @@ namespace Marsol
                 throw ex.ToMarsolException();
             }
         }
+
         /// <summary>
         /// إرسال رسالة نصية قصيرة لمجموعة مستلمين
         /// </summary>
@@ -73,6 +90,23 @@ namespace Marsol
         public Task<SendSmsResponse> SendSMSAsync(string message, params string[] phoneNumbers)
         {
             var request = new SendSmsRequest(message, phoneNumbers.ToList());
+            return SendSMSAsync(request);
+        }
+
+        // <summary>
+        /// إرسال رسالة نصية قصيرة لمجموعة مستلمين
+        /// </summary>
+        /// <param name="message">نص الرسالة المراد إرسالها</param>
+        /// <param name="phoneNumbers">قائمة الأرقام المراد إرسال الرسالة لهم</param>
+        /// <returns></returns>
+        /// <exception cref="MarsolException"></exception>
+        /// <exception cref="MarsolApiServerException"></exception>
+        /// <exception cref="MarsolApiNotFoundException"></exception>
+        /// <exception cref="MarsolApiUnAuthorizedException"></exception>
+        /// <exception cref="MarsolApiBadRequestException"></exception>
+        public Task<SendSmsResponse> SendSMSAsync(string message, List<string> phoneNumbers)
+        {
+            var request = new MarsolSmsRequest(message, phoneNumbers);
             return SendSMSAsync(request);
         }
 
@@ -146,8 +180,9 @@ namespace Marsol
             {
                 throw ex.ToMarsolException();
             }
-        }   
+        }
     }
+
     public enum MarsolEnvironments
     {
         DEMO

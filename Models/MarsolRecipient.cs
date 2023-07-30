@@ -21,6 +21,11 @@ namespace Marsol.Models
         {
             this.PhoneNumber = phoneNumber;
         }
+
+        public MarsolRecipient()
+        {
+            
+        }
         /// <summary>
         /// 
         /// </summary>
