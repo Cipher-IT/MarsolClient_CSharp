@@ -4,10 +4,10 @@ using System.Text;
 
 namespace Marsol.DTOs
 {
-    internal class MarsolApiSendSmsRequest
+    internal class MarsolApiPhonebookSendSmsRequest
     {
         public string message { get; set; }
-        public IEnumerable<string> phoneNumbers { get; set; }
+        public Guid PhonebookId { get; set; }
         public string? SenderId { get; set; }
     }
 }

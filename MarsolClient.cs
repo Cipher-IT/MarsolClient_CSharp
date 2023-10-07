@@ -9,22 +9,23 @@ namespace Marsol
     /// <summary>
     /// خدمة مرسول لإرسال الرسائل القصيرة داخل ليبيا
     /// </summary>
-    public class MarsolClient
+    public partial class MarsolClient
     {
+        private readonly string PublicBaseUrl = "public/";
         private const string SendSMSURL = "send";
         private const string SubscriptionInfoUrl = "subscription-info";
         private const string RequestInfoUrl = "request-info";
         private const string ServicehealthUrl = "health";
-        private readonly MarsolEnvironments Environment = MarsolEnvironments.DEMO;
+        private readonly MarsolEnvironments Environment = MarsolEnvironments.PRODUCTION;
         private readonly Dictionary<MarsolEnvironments, Uri> ApiBaseUrls = new Dictionary<MarsolEnvironments, Uri> {
-            {MarsolEnvironments.DEMO, new Uri("https://marsol-demo.tests.ly/api/")}
+            {MarsolEnvironments.PRODUCTION, new Uri("https://api.marsol.ly/")}
         };
 
         private Uri ApiBaseUrl { get => ApiBaseUrls[Environment]; }
 
         private string Token;
 
-        public MarsolClient(string token, MarsolEnvironments environment = MarsolEnvironments.DEMO)
+        public MarsolClient(string token, MarsolEnvironments environment = MarsolEnvironments.PRODUCTION)
         {
             if (string.IsNullOrWhiteSpace(token))
                 throw new MarsolException("token فارغ");
@@ -32,21 +33,6 @@ namespace Marsol
             Environment = environment;
         }
 
-        /// <summary>
-        /// إرسال رسالة نصية قصيرة لمجموعة مستلمين
-        /// </summary>
-        /// <param name="request">طلب يحتوي على نص الرسالة و قائمة من أرقام المستلمين</param>
-        /// <returns></returns>
-        /// <exception cref="MarsolException"></exception>
-        /// <exception cref="MarsolApiServerException"></exception>
-        /// <exception cref="MarsolApiNotFoundException"></exception>
-        /// <exception cref="MarsolApiUnAuthorizedException"></exception>
-        /// <exception cref="MarsolApiBadRequestException"></exception>
-        [Obsolete("Use MarsolSmsRequest instead", false)]
-        public Task<SendSmsResponse> SendSMSAsync(SendSmsRequest request)
-        {
-            return this.SendSMSAsync(request);
-        }
 
         /// <summary>
         /// إرسال رسالة نصية قصيرة لمجموعة مستلمين
@@ -89,7 +75,7 @@ namespace Marsol
         /// <exception cref="MarsolApiBadRequestException"></exception>
         public Task<SendSmsResponse> SendSMSAsync(string message, params string[] phoneNumbers)
         {
-            var request = new SendSmsRequest(message, phoneNumbers.ToList());
+            var request = new MarsolSmsRequest(message, phoneNumbers.ToList());
             return SendSMSAsync(request);
         }
 
@@ -185,6 +171,6 @@ namespace Marsol
 
     public enum MarsolEnvironments
     {
-        DEMO
+        PRODUCTION
     }
 }
