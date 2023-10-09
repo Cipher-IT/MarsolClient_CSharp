@@ -7,7 +7,7 @@ namespace Marsol.Exceptions
     /// <summary>
     /// خطأ في رقم أو أكثر من المستلمين
     /// </summary>
-    public class MarsolInvalidRecipientsException : MarsolException
+    public class MarsolInvalidRecipientsException : MarsolBadRequestException
     {
         /// <summary>
         /// خطأ في رقم أو أكثر من المستلمين

@@ -30,9 +30,11 @@ namespace Marsol.Models
         /// 
         /// </summary>
         /// <returns></returns>
-        public bool IsValid()
+        public bool IsValid { get => !string.IsNullOrWhiteSpace(this.PhoneNumber) && MOBILE_PHONE_REGEX.IsMatch(this.PhoneNumber); }
+
+        override public string ToString()
         {
-            return !string.IsNullOrWhiteSpace(this.PhoneNumber) && MOBILE_PHONE_REGEX.IsMatch(this.PhoneNumber);
+            return this.PhoneNumber;
         }
 
     }
