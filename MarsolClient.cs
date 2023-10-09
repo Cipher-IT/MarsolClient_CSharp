@@ -6,6 +6,7 @@ using Marsol.Models;
 using Marsol.Models.OTP;
 using Marsol.Models.OTP.Enums;
 using Marsol.Utils;
+using Newtonsoft.Json.Linq;
 
 namespace Marsol
 {
@@ -22,12 +23,9 @@ namespace Marsol
 
         private Uri ApiBaseUrl { get => ApiBaseUrls[Environment]; }
 
-        private string Token;
-
+        public string Token { get; set; } = null;
         public MarsolClient(string token, MarsolEnvironments environment = MarsolEnvironments.PRODUCTION)
         {
-            if (string.IsNullOrWhiteSpace(token))
-                throw new MarsolException("token فارغ");
             Token = token;
             Environment = environment;
         }
@@ -45,6 +43,7 @@ namespace Marsol
         /// <exception cref="MarsolApiBadRequestException"></exception>
         public async Task<SendSmsResponse> SendSMSAsync(MarsolSmsRequest request)
         {
+            TokenNotEmpty();
             request.Validate();
             try
             {
@@ -106,6 +105,7 @@ namespace Marsol
         /// <returns></returns>
         public async Task<SendSmsResponse> SendPhonebookSms(string message, Guid phonebookId, Guid? senderId = null)
         {
+            TokenNotEmpty();
             var request = new MarsolPhonebookSmsRequest(message, phonebookId, senderId);
             request.Validate();
             try
@@ -129,6 +129,7 @@ namespace Marsol
         /// <exception cref="MarsolApiBadRequestException"></exception>
         public async Task<MarsolSubscriptionInfoResponse> GetSubscriptionInfoAsync()
         {
+            TokenNotEmpty();
             try
             {
                 return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/subscription").WithHeader("x-auth-token", Token).GetJsonAsync<MarsolSubscriptionInfoResponse>();
@@ -151,6 +152,7 @@ namespace Marsol
         /// <exception cref="MarsolApiBadRequestException"></exception>
         public async Task<MarsolRequestInfoResponse> GetRequestInfoAsync(Guid requestId)
         {
+            TokenNotEmpty();
             try
             {
                 return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/requests/{requestId}").WithHeader("x-auth-token", Token).GetJsonAsync<MarsolRequestInfoResponse>();
@@ -185,6 +187,7 @@ namespace Marsol
         /// <returns>قائمة أجهزة المرسل الخاصة</returns>
         public async Task<List<MarsolPrivateDevice>> GetPrivateDevicesAsync()
         {
+            TokenNotEmpty();
             try
             {
                 return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/devices").WithHeader("x-auth-token", Token).GetJsonAsync<List<MarsolPrivateDevice>>();
@@ -201,6 +204,7 @@ namespace Marsol
         /// <returns></returns>
         public async Task<List<MarsolPhonebook>> GetPhoneBooksAsync()
         {
+            TokenNotEmpty();
             try
             {
                 return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/phonebooks").WithHeader("x-auth-token", Token).GetJsonAsync<List<MarsolPhonebook>>();
@@ -220,6 +224,7 @@ namespace Marsol
         /// <returns></returns>
         public async Task InsertContactAsync(Guid PhoneBookId, string phoneNumber, string name = null)
         {
+            TokenNotEmpty();
             try
             {
                 await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/phonebooks/{PhoneBookId}/contacts").WithHeader("x-auth-token", Token).PostJsonAsync(new InsertContactRequest { PhoneNumber = phoneNumber, Name = name });
@@ -237,6 +242,7 @@ namespace Marsol
         /// <returns></returns>
         public async Task<InitiateOTPResponse> InitiateOTP(MarsolInitiateOTPRequest request)
         {
+            TokenNotEmpty();
             try
             {
                 return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/otp/initiate").WithHeader("x-auth-token", Token).PostJsonAsync(InitiateOTPRequest.FromModel(request)).ReceiveJson<InitiateOTPResponse>();
@@ -284,6 +290,7 @@ namespace Marsol
         /// <returns></returns>
         public async Task<ResendOTPResponse> ResendOTP(Guid otpRequestId, string resendToken)
         {
+            TokenNotEmpty();
             try
             {
                 return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/otp/resend").WithHeader("x-auth-token", Token).PostJsonAsync(new ResendOTPRequest { RequestId = otpRequestId, ResendToken = resendToken }).ReceiveJson<ResendOTPResponse>();
@@ -301,6 +308,7 @@ namespace Marsol
         /// <returns></returns>
         public async Task<VerifyOTPResponse> VerifyOTPResponse(VerifyOTPRequest request)
         {
+            TokenNotEmpty();
             try
             {
                 return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/otp/verify").WithHeader("x-auth-token", Token).PostJsonAsync(request).ReceiveJson<VerifyOTPResponse>();
@@ -336,6 +344,12 @@ namespace Marsol
             {
                 throw ex.ToMarsolException();
             }
+        }
+
+        private void TokenNotEmpty()
+        {
+            if (string.IsNullOrWhiteSpace(Token))
+                throw new MarsolEmptyTokenException("token فارغ");
         }
     }
 

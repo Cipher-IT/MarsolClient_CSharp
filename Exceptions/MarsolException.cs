@@ -41,4 +41,21 @@
 
         }
     }
+    public class MarsolEmptyTokenException : MarsolBadRequestException
+    {
+        /// <summary>
+        /// خطأ في إحدا المدخلات
+        /// </summary>
+        public MarsolEmptyTokenException(string message) : base(message)
+        {
+
+        }
+        /// <summary>
+        /// خطأ في إحدا المدخلات
+        /// </summary>
+        public MarsolEmptyTokenException()
+        {
+
+        }
+    }
 }
