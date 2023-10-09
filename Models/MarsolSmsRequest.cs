@@ -26,7 +26,7 @@ namespace Marsol.Models
         public MarsolMessage Message { get; set; }
         public List<MarsolRecipient> Recipients { get; set; } = new List<MarsolRecipient>();
         public Guid? SenderId { get; set; } = null;
-        public List<MarsolRecipient> InvalidRecipients { get => this.Recipients?.Where(p => !p.IsValid()).ToList() ?? new List<MarsolRecipient>(); }
+        public List<MarsolRecipient> InvalidRecipients { get => this.Recipients?.Where(p => !p.IsValid).ToList() ?? new List<MarsolRecipient>(); }
 
         public bool IsValid()
         {
@@ -52,7 +52,7 @@ namespace Marsol.Models
             if (Message is null || !Message.IsValid())
                 throw new MarsolInvalidMessageExceptions(Message);
 
-            if (Recipients.Any(p => !p.IsValid()))
+            if (Recipients.Any(p => !p.IsValid))
                 throw new MarsolInvalidRecipientsException(this.InvalidRecipients);
         }
     }
