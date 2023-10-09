@@ -7,7 +7,7 @@ namespace Marsol.Models
     /// </summary>
     public class MarsolRecipient
     {
-        private static readonly string MOBILE_PHONE_REGEX_STRING = @"^09[1|2|4|5][0-9]{7}$";
+        private static readonly string MOBILE_PHONE_REGEX_STRING = @"^09[1|2|3|4|5][0-9]{7}$";
         private static readonly Regex MOBILE_PHONE_REGEX = new Regex(MOBILE_PHONE_REGEX_STRING);
         /// <summary>
         /// 
@@ -30,9 +30,11 @@ namespace Marsol.Models
         /// 
         /// </summary>
         /// <returns></returns>
-        public bool IsValid()
+        public bool IsValid { get => !string.IsNullOrWhiteSpace(this.PhoneNumber) && MOBILE_PHONE_REGEX.IsMatch(this.PhoneNumber); }
+
+        override public string ToString()
         {
-            return !string.IsNullOrWhiteSpace(this.PhoneNumber) && MOBILE_PHONE_REGEX.IsMatch(this.PhoneNumber);
+            return this.PhoneNumber;
         }
 
     }

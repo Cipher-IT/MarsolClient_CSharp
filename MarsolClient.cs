@@ -1,7 +1,10 @@
 ﻿using Flurl.Http;
 using Marsol.DTOs;
+using Marsol.DTOs.OTP;
 using Marsol.Exceptions;
 using Marsol.Models;
+using Marsol.Models.OTP;
+using Marsol.Models.OTP.Enums;
 using Marsol.Utils;
 
 namespace Marsol
@@ -9,22 +12,19 @@ namespace Marsol
     /// <summary>
     /// خدمة مرسول لإرسال الرسائل القصيرة داخل ليبيا
     /// </summary>
-    public class MarsolClient
+    public partial class MarsolClient
     {
-        private const string SendSMSURL = "send";
-        private const string SubscriptionInfoUrl = "subscription-info";
-        private const string RequestInfoUrl = "request-info";
-        private const string ServicehealthUrl = "health";
-        private readonly MarsolEnvironments Environment = MarsolEnvironments.DEMO;
+        private readonly string PublicBaseUrl = "public/";
+        private readonly MarsolEnvironments Environment = MarsolEnvironments.PRODUCTION;
         private readonly Dictionary<MarsolEnvironments, Uri> ApiBaseUrls = new Dictionary<MarsolEnvironments, Uri> {
-            {MarsolEnvironments.DEMO, new Uri("https://marsol-demo.tests.ly/api/")}
+            {MarsolEnvironments.PRODUCTION, new Uri("https://api.marsol.ly/")}
         };
 
         private Uri ApiBaseUrl { get => ApiBaseUrls[Environment]; }
 
         private string Token;
 
-        public MarsolClient(string token, MarsolEnvironments environment = MarsolEnvironments.DEMO)
+        public MarsolClient(string token, MarsolEnvironments environment = MarsolEnvironments.PRODUCTION)
         {
             if (string.IsNullOrWhiteSpace(token))
                 throw new MarsolException("token فارغ");
@@ -32,21 +32,6 @@ namespace Marsol
             Environment = environment;
         }
 
-        /// <summary>
-        /// إرسال رسالة نصية قصيرة لمجموعة مستلمين
-        /// </summary>
-        /// <param name="request">طلب يحتوي على نص الرسالة و قائمة من أرقام المستلمين</param>
-        /// <returns></returns>
-        /// <exception cref="MarsolException"></exception>
-        /// <exception cref="MarsolApiServerException"></exception>
-        /// <exception cref="MarsolApiNotFoundException"></exception>
-        /// <exception cref="MarsolApiUnAuthorizedException"></exception>
-        /// <exception cref="MarsolApiBadRequestException"></exception>
-        [Obsolete("Use MarsolSmsRequest instead", false)]
-        public Task<SendSmsResponse> SendSMSAsync(SendSmsRequest request)
-        {
-            return this.SendSMSAsync(request);
-        }
 
         /// <summary>
         /// إرسال رسالة نصية قصيرة لمجموعة مستلمين
@@ -63,11 +48,12 @@ namespace Marsol
             request.Validate();
             try
             {
-                return await new Uri(ApiBaseUrl, SendSMSURL).WithHeader("x-auth-token", Token).PostJsonAsync(
+                return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/sms/send").WithHeader("x-auth-token", Token).PostJsonAsync(
                     new MarsolApiSendSmsRequest
                     {
                         message = request.Message.Text,
-                        phoneNumbers = request.Recipients.Select(p => p.PhoneNumber)
+                        phoneNumbers = request.Recipients.Select(p => p.PhoneNumber),
+                        SenderId = request.SenderId
                     }).ReceiveJson<SendSmsResponse>();
             }
             catch (FlurlHttpException ex)
@@ -89,7 +75,7 @@ namespace Marsol
         /// <exception cref="MarsolApiBadRequestException"></exception>
         public Task<SendSmsResponse> SendSMSAsync(string message, params string[] phoneNumbers)
         {
-            var request = new SendSmsRequest(message, phoneNumbers.ToList());
+            var request = new MarsolSmsRequest(message, phoneNumbers.ToList());
             return SendSMSAsync(request);
         }
 
@@ -98,16 +84,38 @@ namespace Marsol
         /// </summary>
         /// <param name="message">نص الرسالة المراد إرسالها</param>
         /// <param name="phoneNumbers">قائمة الأرقام المراد إرسال الرسالة لهم</param>
+        /// <param name="senderId">رقم جهاز المرسل</param>
         /// <returns></returns>
         /// <exception cref="MarsolException"></exception>
         /// <exception cref="MarsolApiServerException"></exception>
         /// <exception cref="MarsolApiNotFoundException"></exception>
         /// <exception cref="MarsolApiUnAuthorizedException"></exception>
         /// <exception cref="MarsolApiBadRequestException"></exception>
-        public Task<SendSmsResponse> SendSMSAsync(string message, List<string> phoneNumbers)
+        public Task<SendSmsResponse> SendSMSAsync(string message, List<string> phoneNumbers, Guid? senderId = null)
         {
-            var request = new MarsolSmsRequest(message, phoneNumbers);
+            var request = new MarsolSmsRequest(message, phoneNumbers, senderId);
             return SendSMSAsync(request);
+        }
+
+        /// <summary>
+        /// إرسال رسالة نصية قصيرة لمجموعة مستلمين بإستخدام رقم سجل
+        /// </summary>
+        /// <param name="message">محتوى الرسالة النصية</param>
+        /// <param name="phonebookId">رقم السحل</param>
+        /// <param name="senderId">رقم مرسل خاص إن وجد</param>
+        /// <returns></returns>
+        public async Task<SendSmsResponse> SendPhonebookSms(string message, Guid phonebookId, Guid? senderId = null)
+        {
+            var request = new MarsolPhonebookSmsRequest(message, phonebookId, senderId);
+            request.Validate();
+            try
+            {
+                return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/sms/send-phonebook").WithHeader("x-auth-token", Token).PostJsonAsync(request).ReceiveJson<SendSmsResponse>();
+            }
+            catch (FlurlHttpException ex)
+            {
+                throw ex.ToMarsolException();
+            }
         }
 
         /// <summary>
@@ -123,7 +131,7 @@ namespace Marsol
         {
             try
             {
-                return await new Uri(ApiBaseUrl, SubscriptionInfoUrl).WithHeader("x-auth-token", Token).GetJsonAsync<MarsolSubscriptionInfoResponse>();
+                return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/subscription").WithHeader("x-auth-token", Token).GetJsonAsync<MarsolSubscriptionInfoResponse>();
             }
             catch (FlurlHttpException ex)
             {
@@ -145,7 +153,7 @@ namespace Marsol
         {
             try
             {
-                return await new Uri(ApiBaseUrl, $"{RequestInfoUrl}/{requestId}").WithHeader("x-auth-token", Token).GetJsonAsync<MarsolRequestInfoResponse>();
+                return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/requests/{requestId}").WithHeader("x-auth-token", Token).GetJsonAsync<MarsolRequestInfoResponse>();
             }
             catch (FlurlHttpException ex)
             {
@@ -166,15 +174,163 @@ namespace Marsol
         public Task<MarsolRequestInfoResponse> GetRequestInfoAsync(string requestId)
         {
             if (!Guid.TryParse(requestId, out Guid _requestId))
-                throw new MarsolException($"");
+                throw new MarsolException($"رقم طلب غير صالح");
             return GetRequestInfoAsync(_requestId);
         }
 
+        /// <summary>
+        /// إرجاع قائمة أجهزة المرسل الخاصة
+        /// في حال حجز رقم مرسل خاص او رقم مميز, يمكن إختيار هذا الجهاز عند الإرسال
+        /// </summary>
+        /// <returns>قائمة أجهزة المرسل الخاصة</returns>
+        public async Task<List<MarsolPrivateDevice>> GetPrivateDevicesAsync()
+        {
+            try
+            {
+                return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/devices").WithHeader("x-auth-token", Token).GetJsonAsync<List<MarsolPrivateDevice>>();
+            }
+            catch (FlurlHttpException ex)
+            {
+                throw ex.ToMarsolException();
+            }
+        }
+
+        /// <summary>
+        /// الحصول على سجلات الأرقام المحفوظة
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<MarsolPhonebook>> GetPhoneBooksAsync()
+        {
+            try
+            {
+                return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/phonebooks").WithHeader("x-auth-token", Token).GetJsonAsync<List<MarsolPhonebook>>();
+            }
+            catch (FlurlHttpException ex)
+            {
+                throw ex.ToMarsolException();
+            }
+        }
+
+        /// <summary>
+        /// إدخال جهة إتصال جديدة للسجل للإستخدام في الإرسال لاحقا
+        /// </summary>
+        /// <param name="PhoneBookId">رقم السجل المراد الإدخال اليه</param>
+        /// <param name="phoneNumber">رقم الهاتف</param>
+        /// <param name="name">إسم لجهة الإتصال</param>
+        /// <returns></returns>
+        public async Task InsertContactAsync(Guid PhoneBookId, string phoneNumber, string name = null)
+        {
+            try
+            {
+                await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/phonebooks/{PhoneBookId}/contacts").WithHeader("x-auth-token", Token).PostJsonAsync(new InsertContactRequest { PhoneNumber = phoneNumber, Name = name });
+            }
+            catch (FlurlHttpException ex)
+            {
+                throw ex.ToMarsolException();
+            }
+        }
+
+        /// <summary>
+        /// بداية عملية تأكيد رقم الهاتف
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task<InitiateOTPResponse> InitiateOTP(MarsolInitiateOTPRequest request)
+        {
+            try
+            {
+                return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/otp/initiate").WithHeader("x-auth-token", Token).PostJsonAsync(InitiateOTPRequest.FromModel(request)).ReceiveJson<InitiateOTPResponse>();
+            }
+            catch (FlurlHttpException ex)
+            {
+                throw ex.ToMarsolException();
+            }
+        }
+
+        /// <summary>
+        /// بداية عملية تأكيد رقم الهاتف
+        /// </summary>
+        /// <param name="phoneNumber">رقم الهاتف المراد تأكيده</param>
+        /// <param name="length">طول كود التأكيد (4 أو 6)</param>
+        /// <param name="expiration">صلاحية عملية التأكيد</param>
+        /// <param name="language">لغة رسالة التأكيد</param>
+        /// <param name="clientOS">نظام التشغيل للمستلم</param>
+        /// <returns></returns>
+        /// <exception cref="MarsolException"></exception>
+        public async Task<InitiateOTPResponse> InitiateOTP(
+            string phoneNumber, 
+            MarsolOTPLength length = MarsolOTPLength.FOUR,
+            OtpExpiration expiration = OtpExpiration.TWO_MIN,
+            OTPLanguageEnum language = OTPLanguageEnum.AR,
+            ClientOSEnum clientOS = ClientOSEnum.OTHER)
+        {
+            var recepient = new MarsolRecipient(phoneNumber);
+            if(!recepient.IsValid)
+                throw new MarsolException($"رقم الهاتف غير صالح");
+            return await InitiateOTP(new MarsolInitiateOTPRequest { 
+                PhoneNumber = recepient,
+                Length = length,
+                Expiration = expiration,
+                Language = language,
+                ClientOs = clientOS
+            });
+        }
+
+        /// <summary>
+        /// إعادة إرسال رمز التأكيد
+        /// </summary>
+        /// <param name="otpRequestId"></param>
+        /// <param name="resendToken"></param>
+        /// <returns></returns>
+        public async Task<ResendOTPResponse> ResendOTP(Guid otpRequestId, string resendToken)
+        {
+            try
+            {
+                return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/otp/resend").WithHeader("x-auth-token", Token).PostJsonAsync(new ResendOTPRequest { RequestId = otpRequestId, ResendToken = resendToken }).ReceiveJson<ResendOTPResponse>();
+            }
+            catch (FlurlHttpException ex)
+            {
+                throw ex.ToMarsolException();
+            }
+        }
+
+        /// <summary>
+        /// التحقق من رمز التأكيد
+        /// </summary>
+        /// <param name="request"> بيانات الطلب</param>
+        /// <returns></returns>
+        public async Task<VerifyOTPResponse> VerifyOTPResponse(VerifyOTPRequest request)
+        {
+            try
+            {
+                return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/otp/verify").WithHeader("x-auth-token", Token).PostJsonAsync(request).ReceiveJson<VerifyOTPResponse>();
+            }
+            catch (FlurlHttpException ex)
+            {
+                throw ex.ToMarsolException();
+            }
+        }
+
+        /// <summary>
+        /// التحقق من رمز التأكيد
+        /// </summary>
+        /// <param name="otpRequestId">رقم طلب التأكيد</param>
+        /// <param name="code">كود التأكيد</param>
+        /// <returns></returns>
+        public async Task<VerifyOTPResponse> VerifyOTPResponse(Guid otpRequestId, string code)
+        {
+            return await VerifyOTPResponse(new VerifyOTPRequest { RequestId = otpRequestId, Code = code });
+        }
+
+        /// <summary>
+        /// التأكد من حالة الخدمة
+        /// </summary>
+        /// <returns></returns>
         public async Task<MarsolServiceHealthResponse> GetServiceHealthAsync()
         {
             try
             {
-                return await new Uri(ApiBaseUrl, ServicehealthUrl).GetJsonAsync<MarsolServiceHealthResponse>();
+                return await new Uri(ApiBaseUrl, "health").GetJsonAsync<MarsolServiceHealthResponse>();
             }
             catch (FlurlHttpException ex)
             {
@@ -185,6 +341,6 @@ namespace Marsol
 
     public enum MarsolEnvironments
     {
-        DEMO
+        PRODUCTION
     }
 }

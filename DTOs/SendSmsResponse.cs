@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Marsol.Models
+namespace Marsol.DTOs
 {
     public class SendSmsResponse
     {

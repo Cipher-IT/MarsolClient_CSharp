@@ -34,5 +34,10 @@ namespace Marsol.Models
         /// 
         /// </summary>
         public int Parts { get => !this.IsValid() ? 0 : MarsolSmsUtils.GetPartsCount(this.Text); }
+
+        override public string ToString()
+        {
+            return this.Text;
+        }
     }
 }

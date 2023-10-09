@@ -1,12 +1,10 @@
 # This workflow will build a .NET project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
-name: .NET
+name: Publish Nuget Package
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
     branches: [ "main" ]
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1

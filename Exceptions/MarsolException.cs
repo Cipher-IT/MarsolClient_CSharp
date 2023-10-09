@@ -20,4 +20,25 @@
 
         }
     }
+
+    /// <summary>
+    /// خطأ في إحدا المدخلات
+    /// </summary>
+    public class MarsolBadRequestException : MarsolException
+    {
+        /// <summary>
+        /// خطأ في إحدا المدخلات
+        /// </summary>
+        public MarsolBadRequestException(string message) : base(message)
+        {
+
+        }
+        /// <summary>
+        /// خطأ في إحدا المدخلات
+        /// </summary>
+        public MarsolBadRequestException()
+        {
+
+        }
+    }
 }
