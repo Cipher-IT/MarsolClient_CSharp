@@ -14,7 +14,7 @@ namespace Marsol
     /// </summary>
     public partial class MarsolClient
     {
-        private readonly string PublicBaseUrl = "public/";
+        private readonly string PublicBaseUrl = "public";
         private readonly MarsolEnvironments Environment = MarsolEnvironments.PRODUCTION;
         private readonly Dictionary<MarsolEnvironments, Uri> ApiBaseUrls = new Dictionary<MarsolEnvironments, Uri> {
             {MarsolEnvironments.PRODUCTION, new Uri("https://api.marsol.ly/")}
