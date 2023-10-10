@@ -1,9 +1,9 @@
 ﻿namespace Marsol.DTOs
 {
-    internal class MarsolApiSendSmsRequest
+    internal class MarsolApiSendSmsToPhoneBookRequest
     {
         public string Message { get; set; }
-        public IEnumerable<string> PhoneNumbers { get; set; }
+        public Guid PhonebookId { get; set; }
         public Guid? SenderId { get; set; }
     }
 }

@@ -5,7 +5,7 @@ using Texting;
 
 namespace Marsol.Utils
 {
-    internal static class MarsolSmsUtils
+    public static class MarsolSmsUtils
     {
         private static readonly SmsHelpers Utils = new SmsHelpers();
         
@@ -14,12 +14,12 @@ namespace Marsol.Utils
             return Utils.CountSmsParts(message);
         }
         
-        public static bool IsGSM(string message)
+        internal static bool IsGSM(string message)
         {
             return Utils.GetEncoding(message) == SmsEncoding.Gsm7Bit;
         }
-        
-        public static bool IsUnicode(string message)
+
+        internal static bool IsUnicode(string message)
         {
             return Utils.GetEncoding(message) == SmsEncoding.GsmUnicode;
         }

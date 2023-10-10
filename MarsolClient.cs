@@ -1,4 +1,5 @@
 ﻿using Flurl.Http;
+using Flurl.Http.Configuration;
 using Marsol.DTOs;
 using Marsol.DTOs.OTP;
 using Marsol.Exceptions;
@@ -6,7 +7,9 @@ using Marsol.Models;
 using Marsol.Models.OTP;
 using Marsol.Models.OTP.Enums;
 using Marsol.Utils;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 
 namespace Marsol
 {
@@ -28,6 +31,16 @@ namespace Marsol
         {
             Token = token;
             Environment = environment;
+            FlurlHttp.Configure(settings =>
+            {
+                var jsonSettings = new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                    ObjectCreationHandling = ObjectCreationHandling.Replace,
+                    ContractResolver = new CamelCasePropertyNamesContractResolver()
+                };
+                settings.JsonSerializer = new NewtonsoftJsonSerializer(jsonSettings);
+            });
         }
 
 
@@ -50,8 +63,8 @@ namespace Marsol
                 return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/sms/send").WithHeader("x-auth-token", Token).PostJsonAsync(
                     new MarsolApiSendSmsRequest
                     {
-                        message = request.Message.Text,
-                        phoneNumbers = request.Recipients.Select(p => p.PhoneNumber),
+                        Message = request.Message.Text,
+                        PhoneNumbers = request.Recipients.Select(p => p.PhoneNumber),
                         SenderId = request.SenderId
                     }).ReceiveJson<SendSmsResponse>();
             }
@@ -103,14 +116,20 @@ namespace Marsol
         /// <param name="phonebookId">رقم السحل</param>
         /// <param name="senderId">رقم مرسل خاص إن وجد</param>
         /// <returns></returns>
-        public async Task<SendSmsResponse> SendPhonebookSms(string message, Guid phonebookId, Guid? senderId = null)
+        public async Task<SendSmsResponse> SendPhonebookSmsAsync(string message, Guid phonebookId, Guid? senderId = null)
         {
             TokenNotEmpty();
             var request = new MarsolPhonebookSmsRequest(message, phonebookId, senderId);
             request.Validate();
             try
             {
-                return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/sms/send-phonebook").WithHeader("x-auth-token", Token).PostJsonAsync(request).ReceiveJson<SendSmsResponse>();
+                return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/sms/send-phonebook").WithHeader("x-auth-token", Token)
+                    .PostJsonAsync(new MarsolApiSendSmsToPhoneBookRequest
+                    {
+                        Message = request.Message.Text,
+                        PhonebookId = request.PhoneBookId,
+                        SenderId = request.SenderId
+                    }).ReceiveJson<SendSmsResponse>();
             }
             catch (FlurlHttpException ex)
             {
@@ -235,12 +254,13 @@ namespace Marsol
             }
         }
 
+
         /// <summary>
         /// بداية عملية تأكيد رقم الهاتف
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task<InitiateOTPResponse> InitiateOTP(MarsolInitiateOTPRequest request)
+        public async Task<InitiateOTPResponse> InitiateOTPAsync(MarsolInitiateOTPRequest request)
         {
             TokenNotEmpty();
             try
@@ -263,17 +283,18 @@ namespace Marsol
         /// <param name="clientOS">نظام التشغيل للمستلم</param>
         /// <returns></returns>
         /// <exception cref="MarsolException"></exception>
-        public async Task<InitiateOTPResponse> InitiateOTP(
-            string phoneNumber, 
+        public async Task<InitiateOTPResponse> InitiateOTPAsync(
+            string phoneNumber,
             MarsolOTPLength length = MarsolOTPLength.FOUR,
             OtpExpiration expiration = OtpExpiration.TWO_MIN,
             OTPLanguageEnum language = OTPLanguageEnum.AR,
             ClientOSEnum clientOS = ClientOSEnum.OTHER)
         {
             var recepient = new MarsolRecipient(phoneNumber);
-            if(!recepient.IsValid)
+            if (!recepient.IsValid)
                 throw new MarsolException($"رقم الهاتف غير صالح");
-            return await InitiateOTP(new MarsolInitiateOTPRequest { 
+            return await InitiateOTPAsync(new MarsolInitiateOTPRequest
+            {
                 PhoneNumber = recepient,
                 Length = length,
                 Expiration = expiration,
@@ -288,7 +309,7 @@ namespace Marsol
         /// <param name="otpRequestId"></param>
         /// <param name="resendToken"></param>
         /// <returns></returns>
-        public async Task<ResendOTPResponse> ResendOTP(Guid otpRequestId, string resendToken)
+        public async Task<ResendOTPResponse> ResendOTPAsync(Guid otpRequestId, string resendToken)
         {
             TokenNotEmpty();
             try
@@ -306,28 +327,20 @@ namespace Marsol
         /// </summary>
         /// <param name="request"> بيانات الطلب</param>
         /// <returns></returns>
-        public async Task<VerifyOTPResponse> VerifyOTPResponse(VerifyOTPRequest request)
+        public async Task<VerifyOTPResponse> VerifyOTPResponseAsync(VerifyOTPRequest request)
         {
-            TokenNotEmpty();
-            try
-            {
-                return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/otp/verify").WithHeader("x-auth-token", Token).PostJsonAsync(request).ReceiveJson<VerifyOTPResponse>();
-            }
-            catch (FlurlHttpException ex)
-            {
-                throw ex.ToMarsolException();
-            }
+            return await VerifyOTPResponseAsync(request);
         }
-
+        
         /// <summary>
         /// التحقق من رمز التأكيد
         /// </summary>
         /// <param name="otpRequestId">رقم طلب التأكيد</param>
         /// <param name="code">كود التأكيد</param>
         /// <returns></returns>
-        public async Task<VerifyOTPResponse> VerifyOTPResponse(Guid otpRequestId, string code)
+        public async Task<VerifyOTPResponse> VerifyOTPResponseAsync(Guid otpRequestId, string code)
         {
-            return await VerifyOTPResponse(new VerifyOTPRequest { RequestId = otpRequestId, Code = code });
+            return await VerifyOTPResponseAsync(new VerifyOTPRequest { RequestId = otpRequestId, Code = code });
         }
 
         /// <summary>
