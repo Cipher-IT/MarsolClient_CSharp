@@ -331,7 +331,15 @@ namespace Marsol
         /// <returns></returns>
         public async Task<VerifyOTPResponse> VerifyOTPResponseAsync(VerifyOTPRequest request)
         {
-            return await VerifyOTPResponseAsync(request);
+            TokenNotEmpty();
+            try
+            {
+                return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/otp/verify").WithHeader("x-auth-token", Token).PostJsonAsync(request).ReceiveJson<VerifyOTPResponse>();
+            }
+            catch (FlurlHttpException ex)
+            {
+                throw ex.ToMarsolException();
+            }
         }
         
         /// <summary>
