@@ -7,4 +7,10 @@ namespace Marsol.Models.OTP.Enums
         AR,
         EN
     }
+
+    public enum OTPOperationType
+    {
+        CODE,
+        FLASH_CALL,
+    }
 }

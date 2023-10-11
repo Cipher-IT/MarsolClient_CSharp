@@ -9,6 +9,7 @@ namespace Marsol.DTOs.OTP
         public int Expiration { get; set; }
         public string ClientOs { get; set; }
         public string Language { get; set; }
+        public string Operation { get; set; } = "CODE";
 
         public static InitiateOTPRequest FromModel(MarsolInitiateOTPRequest request)
         {
@@ -18,7 +19,8 @@ namespace Marsol.DTOs.OTP
                 Length = ((int)request.Length),
                 Expiration = ((int)request.Expiration),
                 ClientOs = request.ClientOs.ToString(),
-                Language = request.Language.ToString()
+                Language = request.Language.ToString(),
+                Operation = request.Operation.ToString()
             };
         }
     }

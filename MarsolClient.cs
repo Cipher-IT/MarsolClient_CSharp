@@ -288,7 +288,8 @@ namespace Marsol
             MarsolOTPLength length = MarsolOTPLength.FOUR,
             OtpExpiration expiration = OtpExpiration.TWO_MIN,
             OTPLanguageEnum language = OTPLanguageEnum.AR,
-            ClientOSEnum clientOS = ClientOSEnum.OTHER)
+            ClientOSEnum clientOS = ClientOSEnum.OTHER,
+            OTPOperationType operaion = OTPOperationType.CODE)
         {
             var recepient = new MarsolRecipient(phoneNumber);
             if (!recepient.IsValid)
@@ -299,7 +300,8 @@ namespace Marsol
                 Length = length,
                 Expiration = expiration,
                 Language = language,
-                ClientOs = clientOS
+                ClientOs = clientOS,
+                Operation = operaion
             });
         }
 
@@ -309,12 +311,12 @@ namespace Marsol
         /// <param name="otpRequestId"></param>
         /// <param name="resendToken"></param>
         /// <returns></returns>
-        public async Task<ResendOTPResponse> ResendOTPAsync(Guid otpRequestId, string resendToken)
+        public async Task<ResendOTPResponse> ResendOTPAsync(Guid otpRequestId, string resendToken, OTPOperationType operationType = OTPOperationType.CODE)
         {
             TokenNotEmpty();
             try
             {
-                return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/otp/resend").WithHeader("x-auth-token", Token).PostJsonAsync(new ResendOTPRequest { RequestId = otpRequestId, ResendToken = resendToken }).ReceiveJson<ResendOTPResponse>();
+                return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/otp/resend").WithHeader("x-auth-token", Token).PostJsonAsync(new ResendOTPRequest { RequestId = otpRequestId, ResendToken = resendToken, Operation= operationType.ToString() }).ReceiveJson<ResendOTPResponse>();
             }
             catch (FlurlHttpException ex)
             {

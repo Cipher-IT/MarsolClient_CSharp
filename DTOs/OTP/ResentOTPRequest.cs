@@ -4,6 +4,7 @@
     {
         public Guid RequestId { get; set; }
         public string ResendToken { get; set; }
+        public string Operation { get; set; } = "CODE";
     }
 
     public class ResendOTPResponse
