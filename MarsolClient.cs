@@ -21,7 +21,8 @@ namespace Marsol
         private readonly string PublicBaseUrl = "public";
         private readonly MarsolEnvironments Environment = MarsolEnvironments.PRODUCTION;
         private readonly Dictionary<MarsolEnvironments, Uri> ApiBaseUrls = new Dictionary<MarsolEnvironments, Uri> {
-            {MarsolEnvironments.PRODUCTION, new Uri("https://api.marsol.ly/")}
+            {MarsolEnvironments.PRODUCTION, new Uri("https://api.marsol.ly/")},
+            {MarsolEnvironments.STAGING, new Uri("https://staging.marsol.ly/")}
         };
 
         private Uri ApiBaseUrl { get => ApiBaseUrls[Environment]; }
@@ -378,6 +379,7 @@ namespace Marsol
 
     public enum MarsolEnvironments
     {
-        PRODUCTION
+        PRODUCTION,
+        STAGING,
     }
 }
