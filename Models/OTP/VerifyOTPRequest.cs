@@ -27,6 +27,10 @@
         /// رسالة توضح سبب الفشل في حالة فشل العملية
         /// </summary>
         public string Message { get; set; }
+        /// <summary>
+        /// رقم المستلم المراد تأكيده
+        /// </summary>
+        public string Recipient { get; set; }
     }
 
     public enum VerifyOTPResponseStatus

@@ -88,4 +88,4 @@ public class MarsolRequestInfoResponse
 if you prefere to use the rest api directly, you can check our service swagger of [Marsol Swagger].
 
 [Cipher IT]:<cipher.ly>
-[Marsol Swagger]:<https://marsol-demo.tests.ly/api/swagger>
+[Marsol Swagger]:<https://api.marsol.ly/docs>
