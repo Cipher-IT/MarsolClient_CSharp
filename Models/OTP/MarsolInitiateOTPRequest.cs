@@ -11,5 +11,6 @@ namespace Marsol.Models.OTP
         public ClientOSEnum ClientOs { get; set; } = ClientOSEnum.OTHER;
         public OTPLanguageEnum Language { get; set; } = OTPLanguageEnum.AR;
         public OTPOperationType Operation { get; set; } = OTPOperationType.CODE;
+        public string? SenderId { get; set; }
     }
 }

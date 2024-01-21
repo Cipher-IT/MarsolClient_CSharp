@@ -9,5 +9,6 @@ namespace Marsol.DTOs
     {
         public string? Name { get; set; }
         public string PhoneNumber { get; set; }
+        public Dictionary<string, string>? MetaData { get; set; }
     }
 }

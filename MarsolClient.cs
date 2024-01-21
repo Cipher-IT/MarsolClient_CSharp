@@ -7,9 +7,7 @@ using Marsol.Models;
 using Marsol.Models.OTP;
 using Marsol.Models.OTP.Enums;
 using Marsol.Utils;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
+using System.Text.Json;
 
 namespace Marsol
 {
@@ -32,15 +30,12 @@ namespace Marsol
         {
             Token = token;
             Environment = environment;
-            FlurlHttp.Configure(settings =>
+            FlurlHttp.Clients.WithDefaults(settings =>
             {
-                var jsonSettings = new JsonSerializerSettings
+                settings.Settings.JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions
                 {
-                    NullValueHandling = NullValueHandling.Ignore,
-                    ObjectCreationHandling = ObjectCreationHandling.Replace,
-                    ContractResolver = new CamelCasePropertyNamesContractResolver()
-                };
-                settings.JsonSerializer = new NewtonsoftJsonSerializer(jsonSettings);
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                });
             });
         }
 
@@ -205,12 +200,12 @@ namespace Marsol
         /// في حال حجز رقم مرسل خاص او رقم مميز, يمكن إختيار هذا الجهاز عند الإرسال
         /// </summary>
         /// <returns>قائمة أجهزة المرسل الخاصة</returns>
-        public async Task<List<MarsolPrivateDevice>> GetPrivateDevicesAsync()
+        public async Task<List<MarsolVirtualNumber>> GetVirtualNumbersAsync()
         {
             TokenNotEmpty();
             try
             {
-                return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/devices").WithHeader("x-auth-token", Token).GetJsonAsync<List<MarsolPrivateDevice>>();
+                return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/virtual-numbers").WithHeader("x-auth-token", Token).GetJsonAsync<List<MarsolVirtualNumber>>();
             }
             catch (FlurlHttpException ex)
             {
@@ -242,12 +237,12 @@ namespace Marsol
         /// <param name="phoneNumber">رقم الهاتف</param>
         /// <param name="name">إسم لجهة الإتصال</param>
         /// <returns></returns>
-        public async Task InsertContactAsync(Guid PhoneBookId, string phoneNumber, string name = null)
+        public async Task InsertContactAsync(Guid PhoneBookId, string phoneNumber, string name = null, Dictionary<string,string>? metadata = null)
         {
             TokenNotEmpty();
             try
             {
-                await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/phonebooks/{PhoneBookId}/contacts").WithHeader("x-auth-token", Token).PostJsonAsync(new InsertContactRequest { PhoneNumber = phoneNumber, Name = name });
+                await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/phonebooks/{PhoneBookId}/contacts").WithHeader("x-auth-token", Token).PostJsonAsync(new InsertContactRequest { PhoneNumber = phoneNumber, Name = name, MetaData = metadata });
             }
             catch (FlurlHttpException ex)
             {
@@ -312,12 +307,12 @@ namespace Marsol
         /// <param name="otpRequestId"></param>
         /// <param name="resendToken"></param>
         /// <returns></returns>
-        public async Task<ResendOTPResponse> ResendOTPAsync(Guid otpRequestId, string resendToken, OTPOperationType operationType = OTPOperationType.CODE)
+        public async Task<ApiResendOTPResponse> ResendOTPAsync(Guid otpRequestId, string resendToken, OTPOperationType operationType = OTPOperationType.CODE)
         {
             TokenNotEmpty();
             try
             {
-                return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/otp/resend").WithHeader("x-auth-token", Token).PostJsonAsync(new ResendOTPRequest { RequestId = otpRequestId, ResendToken = resendToken, Operation= operationType.ToString() }).ReceiveJson<ResendOTPResponse>();
+                return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/otp/resend").WithHeader("x-auth-token", Token).PostJsonAsync(new ApiResendOTPRequest { RequestId = otpRequestId, ResendToken = resendToken, Operation= operationType.ToString() }).ReceiveJson<ApiResendOTPResponse>();
             }
             catch (FlurlHttpException ex)
             {

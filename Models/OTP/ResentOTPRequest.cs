@@ -1,13 +1,13 @@
-﻿namespace Marsol.DTOs.OTP
+﻿namespace Marsol.Models.OTP
 {
-    public class ResendOTPRequest
+    public class ApiResendOTPRequest
     {
         public Guid RequestId { get; set; }
         public string ResendToken { get; set; }
         public string Operation { get; set; } = "CODE";
     }
 
-    public class ResendOTPResponse
+    public class ApiResendOTPResponse
     {
         public Guid RequestId { get; set; }
         public string ResendToken { get; set; }

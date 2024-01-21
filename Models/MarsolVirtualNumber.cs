@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Marsol.DTOs
+namespace Marsol.Models
 {
-    public class MarsolPrivateDevice
+    public class MarsolVirtualNumber
     {
         public Guid DeviceId { get; set; }
         public string PhoneNumber { get; set; }

@@ -1,4 +1,4 @@
-﻿namespace Marsol.DTOs
+﻿namespace Marsol.Models
 {
     public class SendSmsResponse
     {

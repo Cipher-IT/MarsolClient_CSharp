@@ -1,4 +1,4 @@
-﻿namespace Marsol.DTOs.OTP
+﻿namespace Marsol.Models.OTP
 {
     /// <summary>
     /// طلب تأكيد رمز التحقق المستلم

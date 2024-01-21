@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Marsol.DTOs.OTP
+﻿namespace Marsol.DTOs.OTP
 {
     public class InitiateOTPResponse
     {
