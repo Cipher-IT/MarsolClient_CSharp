@@ -330,7 +330,13 @@ namespace Marsol
             TokenNotEmpty();
             try
             {
-                return await new Uri(ApiBaseUrl, $"{PublicBaseUrl}/otp/verify").WithHeader("x-auth-token", Token).PostJsonAsync(request).ReceiveJson<VerifyOTPResponse>();
+                var r = new Uri(ApiBaseUrl, $"{PublicBaseUrl}/otp/verify").WithHeader("x-auth-token", Token)
+                    .PostJsonAsync(new ApiVerifyOtpRequest { Code = request.Code,
+                    RequestId = request.RequestId.ToString(),
+                    Operation= request.Operation.ToString()
+                });
+                var response = await r.ReceiveJson<ApiVerityOtpResponse>();
+                return response.ToModel();
             }
             catch (FlurlHttpException ex)
             {
@@ -343,10 +349,11 @@ namespace Marsol
         /// </summary>
         /// <param name="otpRequestId">رقم طلب التأكيد</param>
         /// <param name="code">كود التأكيد</param>
+        /// <param name="operation">نوع إستلام الكود</param>
         /// <returns></returns>
-        public async Task<VerifyOTPResponse> VerifyOTPResponseAsync(Guid otpRequestId, string code)
+        public async Task<VerifyOTPResponse> VerifyOTPResponseAsync(Guid otpRequestId, string code, OTPOperationType operation = OTPOperationType.CODE)
         {
-            return await VerifyOTPResponseAsync(new VerifyOTPRequest { RequestId = otpRequestId, Code = code });
+            return await VerifyOTPResponseAsync(new VerifyOTPRequest { RequestId = otpRequestId, Code = code,Operation = operation });
         }
 
         /// <summary>

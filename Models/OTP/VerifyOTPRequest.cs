@@ -1,4 +1,6 @@
-﻿namespace Marsol.Models.OTP
+﻿using Marsol.Models.OTP.Enums;
+
+namespace Marsol.Models.OTP
 {
     /// <summary>
     /// طلب تأكيد رمز التحقق المستلم
@@ -13,6 +15,7 @@
         /// رقم طلب التأكيد المرجع عند بداية طلب التأكيد
         /// </summary>
         public Guid RequestId { get; set; }
+        public OTPOperationType Operation { get; set; } = OTPOperationType.CODE;
     }
     /// <summary>
     /// نتيحة عملية التحقق 
@@ -27,15 +30,16 @@
         /// رسالة توضح سبب الفشل في حالة فشل العملية
         /// </summary>
         public string Message { get; set; }
-        /// <summary>
-        /// رقم المستلم المراد تأكيده
-        /// </summary>
-        public string Recipient { get; set; }
+        ///// <summary>
+        ///// رقم المستلم المراد تأكيده
+        ///// </summary>
+        //public string Recipient { get; set; }
     }
 
     public enum VerifyOTPResponseStatus
     {
         SUCCESS,
-        FAILED
+        FAILED, 
+        UNKNOWN
     }
 }
