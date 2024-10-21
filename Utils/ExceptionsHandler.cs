@@ -1,15 +1,12 @@
 ﻿using Flurl.Http;
 using Marsol.DTOs;
 using Marsol.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Marsol.Utils
 {
     internal static class ExceptionsHandler
     {
-        
+
         public static MarsolException ToMarsolException(this FlurlHttpException exception)
         {
             try
@@ -44,11 +41,12 @@ namespace Marsol.Utils
                     default:
                         return new MarsolException(response.GetMessage());
                 }
-            }catch (Exception)
+            }
+            catch (Exception)
             {
                 return new MarsolException("خطأ غير معروف");
             }
-            
+
         }
     }
 }

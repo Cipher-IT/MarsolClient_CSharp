@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-	  <VersionPrefix>0.1.9</VersionPrefix>
+	  <VersionPrefix>0.1.10</VersionPrefix>
 	  <ImplicitUsings>enable</ImplicitUsings>
 	  <LangVersion>10.0</LangVersion>
 	  <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
@@ -11,17 +11,18 @@
 	<PropertyGroup>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<Title>Marsol Service Client</Title>
+		<Title>Marsol Service SDK</Title>
 		<Company>Cipher IT</Company>
 		<Description>Libyan SMS service</Description>
 		<Copyright>Cipher IT</Copyright>
 		<PackageTags>sms;libya;libyana;almadar</PackageTags>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageProjectUrl>https://marsol.ly</PackageProjectUrl>
+		<PackageProjectUrl>https://portal.marsol.ly</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/Cipher-IT/MarsolClient_CSharp</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<PackageIcon>marsol_logo_125.png</PackageIcon>
 	</PropertyGroup>
 
   <ItemGroup>
@@ -31,6 +32,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="marsol_logo_125.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Update="README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>

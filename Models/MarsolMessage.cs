@@ -19,7 +19,7 @@ namespace Marsol.Models
             
         }
         /// <summary>
-        /// 
+        /// التأكد من صلاحية الرسالة
         /// </summary>
         /// <returns></returns>
         public bool IsValid()
@@ -31,7 +31,7 @@ namespace Marsol.Models
             return true;
         }
         /// <summary>
-        /// 
+        /// عدد أجزاء الرسالة
         /// </summary>
         public int Parts { get => !this.IsValid() ? 0 : MarsolSmsUtils.GetPartsCount(this.Text); }
 
