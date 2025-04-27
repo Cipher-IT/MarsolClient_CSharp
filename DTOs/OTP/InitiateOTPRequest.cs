@@ -1,4 +1,5 @@
 ﻿using Marsol.Models.OTP;
+using System.Text.Json.Serialization;
 
 namespace Marsol.DTOs.OTP
 {
@@ -11,7 +12,8 @@ namespace Marsol.DTOs.OTP
         public string Language { get; set; }
         public string Operation { get; set; } = "CODE";
         public string? SenderId { get; set; }
-
+        public bool WithoutResend { get; set; } = false;
+        public bool UseTestNumber { get; set; } = true;
         public static InitiateOTPRequest FromModel(MarsolInitiateOTPRequest request)
         {
             return new InitiateOTPRequest
@@ -23,6 +25,8 @@ namespace Marsol.DTOs.OTP
                 Language = request.Language.ToString(),
                 Operation = request.Operation.ToString(),
                 SenderId = request.SenderId,
+                WithoutResend = request.WithoutResend,
+                UseTestNumber = request.UseTestNumbers
             };
         }
     }

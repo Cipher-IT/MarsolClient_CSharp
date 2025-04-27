@@ -12,5 +12,7 @@ namespace Marsol.Models.OTP
         public OTPLanguageEnum Language { get; set; } = OTPLanguageEnum.AR;
         public OTPOperationType Operation { get; set; } = OTPOperationType.CODE;
         public string? SenderId { get; set; }
+        public bool WithoutResend { get; set; } = false;
+        public bool UseTestNumbers { get; set; } = true;
     }
 }
